@@ -7,9 +7,8 @@ Progetto minimale per mostrare progressione a commit piccoli.
 - Maven 3.9+
 
 ## Comandi
-```bash
+```
 mvn -q clean package
 mvn -q exec:java
 ```
-
-**Step 1:** stampa "Yahtzee Lite".
+**Step 2:** aggiunti Dice, ScoreCard e YahtzeeGame.playRandom().
