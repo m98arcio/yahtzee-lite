@@ -11,4 +11,4 @@ Progetto minimale per mostrare progressione a commit piccoli.
 mvn -q clean package
 mvn -q exec:java
 ```
-**Step 2:** aggiunti Dice, ScoreCard e YahtzeeGame.playRandom().
+**Step 3:** Strategy, RandomStrategy, GAEngine minimale e YahtzeeGame.playWith().
