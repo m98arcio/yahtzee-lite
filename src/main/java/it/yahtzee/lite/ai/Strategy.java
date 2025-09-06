@@ -1,4 +1,4 @@
-package it.yahtzee.lite;
+package it.yahtzee.lite.ai;
 
 /** Strategia per decidere quali dadi tenere. */
 public interface Strategy {

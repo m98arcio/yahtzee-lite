@@ -1,4 +1,4 @@
-package it.yahtzee.lite;
+package it.yahtzee.lite.ai;
 
 import java.util.concurrent.ThreadLocalRandom;
 

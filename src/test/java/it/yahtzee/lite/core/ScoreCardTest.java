@@ -1,11 +1,11 @@
-package it.yahtzee.lite;
+package it.yahtzee.lite.core;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ScoreCardTest {
     @Test
-    void sumScoresCorrectly() {
+    void sumIsCorrect() {
         ScoreCard sc = new ScoreCard();
         int s = sc.scoreSum(new int[]{1,2,3,4,5});
         assertEquals(15, s);
