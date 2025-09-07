@@ -14,6 +14,9 @@ public class GAEngine {
     private final int gamesPerEval;
     private final Random rng;
 
+    //torneo più selettivo
+    private final int tournamentK = 4;
+
     public GAEngine(int population, int generations, int gamesPerEval, long seed){
         this.population = population;
         this.generations = generations;
@@ -34,17 +37,20 @@ public class GAEngine {
                 fit[i] = eval(game, pop.get(i));
                 if(fit[i] > overallBestFit){ overallBestFit = fit[i]; best = pop.get(i); }
             }
+
+            // logging per generazione: best e average
             double genBest = -1, sum = 0;
             for (double f : fit) { if (f > genBest) genBest = f; sum += f; }
             double avg = sum / fit.length;
             System.out.printf("Gen %3d | best=%.2f | avg=%.2f%n", g, genBest, avg);
 
+            // nuova popolazione via torneo k=4 + "crossover" semplice (uniforme tra i due)
             List<Genome> next = new ArrayList<>();
             while(next.size()<population){
                 Genome p1 = tournament(pop, fit);
                 Genome p2 = tournament(pop, fit);
                 int childT = rng.nextBoolean() ? p1.threshold : p2.threshold;
-                if(rng.nextDouble() < 0.2) childT += rng.nextBoolean() ? 1 : -1;
+                if(rng.nextDouble() < 0.2) childT += rng.nextBoolean() ? 1 : -1; // mutazione
                 childT = Math.max(1, Math.min(6, childT));
                 next.add(new Genome(childT));
             }
@@ -54,6 +60,7 @@ public class GAEngine {
     }
 
     private double eval(YahtzeeGame game, Genome g){
+        // strategia: tieni i dadi >= threshold
         Strategy s = (dice, rollsLeft)->{
             boolean[] keep = new boolean[5];
             for(int i=0;i<5;i++) keep[i] = dice[i] >= g.threshold;
@@ -64,9 +71,17 @@ public class GAEngine {
         return sum / gamesPerEval;
     }
 
+    //torneo k=4 → scegli il migliore tra k candidati
     private Genome tournament(List<Genome> pop, double[] fit){
-        int i = rng.nextInt(pop.size());
-        int j = rng.nextInt(pop.size());
-        return fit[i] >= fit[j] ? pop.get(i) : pop.get(j);
+        int bestIdx = rng.nextInt(pop.size());
+        double bestFit = fit[bestIdx];
+        for (int c = 1; c < tournamentK; c++) {
+            int idx = rng.nextInt(pop.size());
+            if (fit[idx] > bestFit) {
+                bestIdx = idx;
+                bestFit = fit[idx];
+            }
+        }
+        return pop.get(bestIdx);
     }
 }
