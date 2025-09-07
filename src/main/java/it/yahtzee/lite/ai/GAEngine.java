@@ -6,10 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-/**
- * GA con seed e fitness configurabile.
- * In STEP 6 aggiungiamo logging console: per ogni generazione stampiamo best e avg.
- */
 public class GAEngine {
     public static class Genome { public int threshold; public Genome(int t){ this.threshold=t; } }
 
@@ -38,19 +34,17 @@ public class GAEngine {
                 fit[i] = eval(game, pop.get(i));
                 if(fit[i] > overallBestFit){ overallBestFit = fit[i]; best = pop.get(i); }
             }
-            // logging per generazione: best e average
             double genBest = -1, sum = 0;
             for (double f : fit) { if (f > genBest) genBest = f; sum += f; }
             double avg = sum / fit.length;
             System.out.printf("Gen %3d | best=%.2f | avg=%.2f%n", g, genBest, avg);
 
-            // nuova popolazione via torneo k=2 + crossover uniforme
             List<Genome> next = new ArrayList<>();
             while(next.size()<population){
                 Genome p1 = tournament(pop, fit);
                 Genome p2 = tournament(pop, fit);
                 int childT = rng.nextBoolean() ? p1.threshold : p2.threshold;
-                if(rng.nextDouble() < 0.2) childT += rng.nextBoolean() ? 1 : -1; // mutazione
+                if(rng.nextDouble() < 0.2) childT += rng.nextBoolean() ? 1 : -1;
                 childT = Math.max(1, Math.min(6, childT));
                 next.add(new Genome(childT));
             }
@@ -60,7 +54,6 @@ public class GAEngine {
     }
 
     private double eval(YahtzeeGame game, Genome g){
-        // strategia: tieni i dadi >= threshold
         Strategy s = (dice, rollsLeft)->{
             boolean[] keep = new boolean[5];
             for(int i=0;i<5;i++) keep[i] = dice[i] >= g.threshold;

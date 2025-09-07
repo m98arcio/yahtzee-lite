@@ -28,7 +28,6 @@ public class Main {
 
         int pop = Integer.parseInt(cfg.getOrDefault("pop", "20"));
         int gens = Integer.parseInt(cfg.getOrDefault("gens", "10"));
-        // STEP 6: fitness più robusta → 10 partite per individuo di default
         int games = Integer.parseInt(cfg.getOrDefault("games", "10"));
 
         GAEngine ga = new GAEngine(pop, gens, games, seed);

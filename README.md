@@ -1,14 +1,23 @@
 # Yahtzee Lite
 
-Progetto minimale per mostrare progressione a commit piccoli.
+Progetto dimostrativo per l'esame di Automated Software Delivery.
 
-## Requisiti
-- Java 21
-- Maven 3.9+
+## Struttura
 
-## Comandi
+- `app/` → ingresso applicazione (`Main`)
+- `core/` → logica del gioco (`Dice`, `ScoreCard`, `YahtzeeGame`)
+- `ai/` → algoritmo genetico e strategie
+
+## Build & Run
+
+```bash
+mvn clean package
+mvn exec:java -Dexec.args="--seed=123 --pop=20 --gens=10 --games=10"
 ```
-mvn -q clean package
-mvn -q exec:java
+
+## Docker
+
+```bash
+docker build -t yahtzee-lite .
+docker run --rm yahtzee-lite --seed=123 --pop=20 --gens=10 --games=10
 ```
-**Step 3:** Strategy, RandomStrategy, GAEngine minimale e YahtzeeGame.playWith().

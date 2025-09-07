@@ -1,0 +1,5 @@
+services:
+  app:
+    build: .
+    image: yahtzee-lite:latest
+    command: ["--seed=123","--pop=20","--gens=10","--games=10"]

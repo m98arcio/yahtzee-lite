@@ -8,7 +8,6 @@
   <properties>
     <maven.compiler.release>21</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.test.skip>false</maven.test.skip>
   </properties>
   <dependencies>
     <dependency>
@@ -29,19 +28,11 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.2.5</version>
-        <configuration>
-          <useModulePath>false</useModulePath>
-        </configuration>
-      </plugin>
-      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
         <version>3.5.0</version>
         <configuration>
-          <mainClass>it.yahtzee.lite.Main</mainClass>
+          <mainClass>it.yahtzee.lite.app.Main</mainClass>
         </configuration>
       </plugin>
     </plugins>
