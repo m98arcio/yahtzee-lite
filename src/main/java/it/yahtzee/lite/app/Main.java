@@ -23,12 +23,13 @@ public class Main {
         Map<String,String> cfg = parseArgs(args);
         long seed = cfg.containsKey("seed")
                 ? Long.parseLong(cfg.get("seed"))
-                : ThreadLocalRandom.current().nextLong();
+                : java.util.concurrent.ThreadLocalRandom.current().nextLong();
         System.out.println("Yahtzee Lite — GA con seed = " + seed);
 
         int pop = Integer.parseInt(cfg.getOrDefault("pop", "20"));
         int gens = Integer.parseInt(cfg.getOrDefault("gens", "10"));
-        int games = Integer.parseInt(cfg.getOrDefault("games", "1"));
+        // STEP 5: fitness ancora debole ma un po' meno rumorosa → 3 partite di default
+        int games = Integer.parseInt(cfg.getOrDefault("games", "3"));
 
         GAEngine ga = new GAEngine(pop, gens, games, seed);
         GAEngine.Genome best = ga.run();
