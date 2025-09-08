@@ -10,6 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * GA con:
+ * - seed riproducibile
+ * - fitness come media su N partite
+ * - torneo k=4, elitismo=2
+ * - logging CSV aggregato (fitness.csv) e dettagliato per individuo (fitness_details.csv)
+ */
 public class GAEngine {
     public static class Genome { public int threshold; public Genome(int t){ this.threshold=t; } }
 
@@ -38,22 +45,24 @@ public class GAEngine {
         // === logging CSV ===
         File outDir = new File("runs");
         if (!outDir.exists()) outDir.mkdirs();
-        try (PrintWriter csv = new PrintWriter(new FileWriter(new File(outDir, "fitness.csv")))) {
+        try (PrintWriter csv = new PrintWriter(new FileWriter(new File(outDir, "fitness.csv")));
+             PrintWriter details = new PrintWriter(new FileWriter(new File(outDir, "fitness_details.csv")))) {
             csv.println("gen,best,avg");
+            details.println("gen,index,fitness");
 
             for(int g=0; g<generations; g++){
                 double[] fit = new double[population];
                 for(int i=0;i<population;i++){
                     fit[i] = eval(game, pop.get(i));
                     if(fit[i] > overallBestFit){ overallBestFit = fit[i]; best = pop.get(i); }
+                    // logging dettagliato per individuo
+                    details.printf("%d,%d,%.4f%n", g, i, fit[i]);
                 }
 
                 double genBest = -1, sum = 0;
                 for (double f : fit) { if (f > genBest) genBest = f; sum += f; }
                 double avg = sum / fit.length;
                 System.out.printf("Gen %3d | best=%.2f | avg=%.2f%n", g, genBest, avg);
-
-                // scrive su CSV
                 csv.printf("%d,%.2f,%.2f%n", g, genBest, avg);
 
                 // nuova popolazione con elitismo + torneo

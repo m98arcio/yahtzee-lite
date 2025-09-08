@@ -2,6 +2,7 @@ package it.yahtzee.lite.ai;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+/** Strategia baseline: sceglie casualmente quali dadi tenere. */
 public class RandomStrategy implements Strategy {
     @Override
     public boolean[] chooseKeep(int[] dice, int rollsLeft) {
