@@ -24,13 +24,21 @@ public class Main {
         long seed = cfg.containsKey("seed")
                 ? Long.parseLong(cfg.get("seed"))
                 : ThreadLocalRandom.current().nextLong();
-        System.out.println("Yahtzee Lite — GA con seed = " + seed);
 
-        int pop = Integer.parseInt(cfg.getOrDefault("pop", "20"));
-        int gens = Integer.parseInt(cfg.getOrDefault("gens", "10"));
-        int games = Integer.parseInt(cfg.getOrDefault("games", "10"));
+        int pop     = Integer.parseInt(cfg.getOrDefault("pop", "20"));
+        int gens    = Integer.parseInt(cfg.getOrDefault("gens", "10"));
+        int games   = Integer.parseInt(cfg.getOrDefault("games", "10"));
 
-        GAEngine ga = new GAEngine(pop, gens, games, seed);
+        // STEP 15: parametri GA da CLI (con default sensati)
+        int k           = Integer.parseInt(cfg.getOrDefault("k", "4"));
+        int elitism     = Integer.parseInt(cfg.getOrDefault("elitism", "2"));
+        double mutRate  = Double.parseDouble(cfg.getOrDefault("mutRate", "0.2"));
+
+        System.out.println("Yahtzee Lite — seed=" + seed +
+                " pop=" + pop + " gens=" + gens + " games=" + games +
+                " k=" + k + " elitism=" + elitism + " mutRate=" + mutRate);
+
+        GAEngine ga = new GAEngine(pop, gens, games, seed, k, elitism, mutRate);
         GAEngine.Genome best = ga.run();
         System.out.println("Best threshold trovato: " + best.threshold);
     }
