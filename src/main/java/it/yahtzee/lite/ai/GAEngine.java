@@ -10,13 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-/**
- * GA con:
- * - seed riproducibile
- * - fitness come media su N partite
- * - torneo k=4, elitismo=2
- * - logging CSV aggregato (fitness.csv) e dettagliato per individuo (fitness_details.csv)
- */
 public class GAEngine {
     public static class Genome { public int threshold; public Genome(int t){ this.threshold=t; } }
 
@@ -42,7 +35,6 @@ public class GAEngine {
         Genome best = pop.get(0);
         double overallBestFit = -1;
 
-        // === logging CSV ===
         File outDir = new File("runs");
         if (!outDir.exists()) outDir.mkdirs();
         try (PrintWriter csv = new PrintWriter(new FileWriter(new File(outDir, "fitness.csv")));
@@ -55,7 +47,6 @@ public class GAEngine {
                 for(int i=0;i<population;i++){
                     fit[i] = eval(game, pop.get(i));
                     if(fit[i] > overallBestFit){ overallBestFit = fit[i]; best = pop.get(i); }
-                    // logging dettagliato per individuo
                     details.printf("%d,%d,%.4f%n", g, i, fit[i]);
                 }
 
@@ -65,7 +56,6 @@ public class GAEngine {
                 System.out.printf("Gen %3d | best=%.2f | avg=%.2f%n", g, genBest, avg);
                 csv.printf("%d,%.2f,%.2f%n", g, genBest, avg);
 
-                // nuova popolazione con elitismo + torneo
                 List<Genome> next = new ArrayList<>();
                 int elitesToCopy = Math.min(elitism, population);
                 boolean[] used = new boolean[population];
@@ -82,8 +72,9 @@ public class GAEngine {
                     Genome p1 = tournament(pop, fit);
                     Genome p2 = tournament(pop, fit);
                     int childT = rng.nextBoolean() ? p1.threshold : p2.threshold;
-                    if(rng.nextDouble() < 0.2) childT += rng.nextBoolean() ? 1 : -1;
-                    childT = Math.max(1, Math.min(6, childT));
+                    if(rng.nextDouble() < 0.2) {
+                        childT = mutateThreshold(childT);
+                    }
                     next.add(new Genome(childT));
                 }
                 pop = next;
@@ -93,6 +84,13 @@ public class GAEngine {
         }
 
         return best;
+    }
+
+    private int mutateThreshold(int t){
+        t += rng.nextBoolean() ? 1 : -1;
+        if (t < 1) t = 1;
+        if (t > 6) t = 6;
+        return t;
     }
 
     private double eval(YahtzeeGame game, Genome g){
