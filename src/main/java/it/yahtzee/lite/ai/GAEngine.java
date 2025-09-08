@@ -11,10 +11,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * STEP 14-16:
- * - cleanup stampe superflue (resta solo logging per generazione)
- * - parametri da CLI: torneo k, elitism, mutRate
- * - mutazione adattiva: se non c'è miglioramento per alcune generazioni, aumenta temporaneamente la mutRate
+ * Step 17-19: aggiunge export best_genomes.csv; conserva logging fitness.csv; altri file aggiornati in .gitignore e README.
  */
 public class GAEngine {
     public static class Genome { public int threshold; public Genome(int t){ this.threshold=t; } }
@@ -28,7 +25,6 @@ public class GAEngine {
     private final int elitism;
     private final double baseMutRate;
 
-    // adattivo
     private int stagnation = 0;
     private double lastGenBest = Double.NEGATIVE_INFINITY;
 
@@ -50,11 +46,12 @@ public class GAEngine {
         Genome best = pop.get(0);
         double overallBestFit = -1;
 
-        // CSV (aggregato)
         File outDir = new File("runs");
         if (!outDir.exists()) outDir.mkdirs();
-        try (PrintWriter csv = new PrintWriter(new FileWriter(new File(outDir, "fitness.csv")))) {
+        try (PrintWriter csv = new PrintWriter(new FileWriter(new File(outDir, "fitness.csv")));
+             PrintWriter bests = new PrintWriter(new FileWriter(new File(outDir, "best_genomes.csv")))) {
             csv.println("gen,best,avg");
+            bests.println("gen,threshold");
 
             for(int g=0; g<generations; g++){
                 double[] fit = new double[population];
@@ -64,23 +61,26 @@ public class GAEngine {
                 }
 
                 double genBest = -1, sum = 0;
-                for (double f : fit) { if (f > genBest) genBest = f; sum += f; }
+                int genBestIdx = 0;
+                for (int i=0;i<fit.length;i++) {
+                    double f = fit[i];
+                    if (f > genBest) { genBest = f; genBestIdx = i; }
+                    sum += f;
+                }
                 double avg = sum / fit.length;
                 System.out.printf("Gen %3d | best=%.2f | avg=%.2f%n", g, genBest, avg);
                 csv.printf("%d,%.2f,%.2f%n", g, genBest, avg);
+                bests.printf("%d,%d%n", g, pop.get(genBestIdx).threshold);
 
-                // mutazione adattiva (STEP 16): se nessun miglioramento, aumentiamo temporaneamente
                 double currentMutRate = baseMutRate;
-                if (genBest > lastGenBest + 1e-9) { // miglioramento
+                if (genBest > lastGenBest + 1e-9) {
                     stagnation = 0;
                     lastGenBest = genBest;
                 } else {
                     stagnation++;
-                    // aumenta del 50% ogni generazione senza progresso, max 0.9
                     currentMutRate = Math.min(0.9, baseMutRate * (1.0 + 0.5 * stagnation));
                 }
 
-                // nuova popolazione con elitismo + torneo
                 List<Genome> next = new ArrayList<>();
                 int elitesToCopy = Math.min(elitism, population);
                 boolean[] used = new boolean[population];

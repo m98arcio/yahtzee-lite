@@ -1,6 +1,8 @@
 # Yahtzee Lite
 
-Progetto dimostrativo per Automated Software Delivery — progressione a commit.
+[![CI](https://github.com/m98arcio/yahtzee-lite/actions/workflows/ci.yml/badge.svg)](https://github.com/<user>/<repo>/actions/workflows/ci.yml)
+
+Progetto dimostrativo per Automated Software Delivery
 
 ## Struttura
 ```
@@ -13,35 +15,20 @@ it.yahtzee.lite
 ## Esecuzione
 ```bash
 mvn clean package
-mvn exec:java -Dexec.args="--seed=123 --pop=20 --gens=10 --games=10"
+mvn exec:java -Dexec.args="--seed=123 --pop=20 --gens=10 --games=10 --k=4 --elitism=2 --mutRate=0.2"
 ```
-
-### Parametri
-- `--seed`  : long per RNG (se assente, viene generato casualmente)
-- `--pop`   : dimensione popolazione
-- `--gens`  : numero generazioni
-- `--games` : partite per valutazione fitness (default robusto: 10)
 
 ## Output & Logging
 - Console: per generazione stampa `best` e `avg`.
 - File CSV in `runs/`:
-  - `fitness.csv` con colonne `gen,best,avg`
-  - `fitness_details.csv` con `gen,index,fitness` per individuo
+  - `fitness.csv` → `gen,best,avg`
+  - `best_genomes.csv` → `gen,threshold`
 
 ## CI (GitHub Actions)
-Il workflow è in `.github/workflows/ci.yml` e lancia `mvn clean test` ad ogni push/PR su `main`.
+Workflow in `.github/workflows/ci.yml` (Java 21 + Maven).
 
 ## Docker
-Build & run:
 ```bash
 docker build -t yahtzee-lite .
-docker run --rm yahtzee-lite --seed=123 --pop=20 --gens=10 --games=10
+docker run --rm yahtzee-lite --seed=123 --pop=20 --gens=10 --games=10 --k=4 --elitism=2 --mutRate=0.2
 ```
-Oppure:
-```bash
-docker compose up --build
-```
-
-## Note
-- Il GA usa torneo **k=4** ed **elitismo=2**.
-- La mutazione del `threshold` è limitata a `[1..6]` (bugfix Step 11).
