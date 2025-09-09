@@ -11,14 +11,14 @@ public class ScoreCard {
     private final boolean[] used = new boolean[6];
     private int upperTotal = 0;
 
-    /** Punti ottenibili per una categoria con i dadi correnti. */
+    //Punti ottenibili per una categoria con i dadi correnti
     public int scoreFor(Category c, int[] dice){
         int cnt = 0;
         for (int v : dice) if (v == c.face) cnt++;
         return cnt * c.face;
     }
 
-    /** Applica la categoria scelta e aggiorna il totale. */
+    //Applica la categoria scelta e aggiorna il totale
     public void use(Category c, int[] dice){
         if (used[c.ordinal()]) throw new IllegalStateException("Categoria già usata: " + c);
         upperTotal += scoreFor(c, dice);
@@ -33,7 +33,7 @@ public class ScoreCard {
         return left;
     }
 
-    /** Totale superiore con eventuale bonus (63 -> +35). */
+    // Totale superiore con eventuale bonus (63 -> +35)
     public int totalWithBonus(){
         int bonus = (upperTotal >= 63) ? 35 : 0;
         return upperTotal + bonus;

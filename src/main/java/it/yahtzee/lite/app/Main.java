@@ -21,25 +21,28 @@ public class Main {
 
     public static void main(String[] args) {
         Map<String,String> cfg = parseArgs(args);
+
         long seed = cfg.containsKey("seed")
                 ? Long.parseLong(cfg.get("seed"))
                 : ThreadLocalRandom.current().nextLong();
 
-        int pop     = Integer.parseInt(cfg.getOrDefault("pop", "100"));
-        int gens    = Integer.parseInt(cfg.getOrDefault("gens", "50"));
-        int games   = Integer.parseInt(cfg.getOrDefault("games", "100"));
+        int pop     = Integer.parseInt(cfg.getOrDefault("pop", "20"));
+        int gens    = Integer.parseInt(cfg.getOrDefault("gens", "10"));
+        int games   = Integer.parseInt(cfg.getOrDefault("games", "10"));
 
-        // STEP 15: parametri GA da CLI (con default sensati)
         int k           = Integer.parseInt(cfg.getOrDefault("k", "4"));
-        int elitism     = Integer.parseInt(cfg.getOrDefault("elitism", "3"));
+        int elitism     = Integer.parseInt(cfg.getOrDefault("elitism", "2"));
         double mutRate  = Double.parseDouble(cfg.getOrDefault("mutRate", "0.2"));
+
+        // nuovo parametro: quante partite rigiocare col best genome
+        int bestRuns = Integer.parseInt(cfg.getOrDefault("bestRuns", "300"));
 
         System.out.println("Yahtzee Lite — seed=" + seed +
                 " pop=" + pop + " gens=" + gens + " games=" + games +
-                " k=" + k + " elitism=" + elitism + " mutRate=" + mutRate);
+                " k=" + k + " elitism=" + elitism + " mutRate=" + mutRate +
+                " bestRuns=" + bestRuns);
 
-        GAEngine ga = new GAEngine(pop, gens, games, seed, k, elitism, mutRate);
-        GAEngine.Genome best = ga.run();
-        System.out.println("Best threshold trovato: " + best.threshold);
+        GAEngine ga = new GAEngine(pop, gens, games, seed, k, elitism, mutRate, bestRuns);
+        ga.run();
     }
 }
