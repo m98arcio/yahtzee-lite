@@ -10,9 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Step 17-19: aggiunge export best_genomes.csv; conserva logging fitness.csv; altri file aggiornati in .gitignore e README.
- */
+/** GAEngine aggiornato a usare la partita 'upper section' (6 round con scelta categoria). */
 public class GAEngine {
     public static class Genome { public int threshold; public Genome(int t){ this.threshold=t; } }
 
@@ -60,8 +58,7 @@ public class GAEngine {
                     if(fit[i] > overallBestFit){ overallBestFit = fit[i]; best = pop.get(i); }
                 }
 
-                double genBest = -1, sum = 0;
-                int genBestIdx = 0;
+                double genBest = -1, sum = 0; int genBestIdx = 0;
                 for (int i=0;i<fit.length;i++) {
                     double f = fit[i];
                     if (f > genBest) { genBest = f; genBestIdx = i; }
@@ -73,13 +70,8 @@ public class GAEngine {
                 bests.printf("%d,%d%n", g, pop.get(genBestIdx).threshold);
 
                 double currentMutRate = baseMutRate;
-                if (genBest > lastGenBest + 1e-9) {
-                    stagnation = 0;
-                    lastGenBest = genBest;
-                } else {
-                    stagnation++;
-                    currentMutRate = Math.min(0.9, baseMutRate * (1.0 + 0.5 * stagnation));
-                }
+                if (genBest > lastGenBest + 1e-9) { stagnation = 0; lastGenBest = genBest; }
+                else { stagnation++; currentMutRate = Math.min(0.9, baseMutRate * (1.0 + 0.5 * stagnation)); }
 
                 List<Genome> next = new ArrayList<>();
                 int elitesToCopy = Math.min(elitism, population);
@@ -119,13 +111,14 @@ public class GAEngine {
     }
 
     private double eval(YahtzeeGame game, Genome g){
+        // strategia: tieni i dadi >= threshold
         Strategy s = (dice, rollsLeft)->{
             boolean[] keep = new boolean[5];
             for(int i=0;i<5;i++) keep[i] = dice[i] >= g.threshold;
             return keep;
         };
         double sum = 0;
-        for(int i=0;i<gamesPerEval;i++) sum += game.playWith(s);
+        for(int i=0;i<gamesPerEval;i++) sum += game.playUpperWith(s);
         return sum / gamesPerEval;
     }
 
@@ -134,10 +127,7 @@ public class GAEngine {
         double bestFit = fit[bestIdx];
         for (int c = 1; c < tournamentK; c++) {
             int idx = rng.nextInt(pop.size());
-            if (fit[idx] > bestFit) {
-                bestIdx = idx;
-                bestFit = fit[idx];
-            }
+            if (fit[idx] > bestFit) { bestIdx = idx; bestFit = fit[idx]; }
         }
         return pop.get(bestIdx);
     }
