@@ -7,3 +7,4 @@ public class AlwaysKeepAllStrategy implements Strategy {
         return new boolean[]{true, true, true, true, true};
     }
 }
+

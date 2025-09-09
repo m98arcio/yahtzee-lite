@@ -11,7 +11,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <checkstyle.version>10.17.0</checkstyle.version>
     <maven.checkstyle.plugin.version>3.3.1</maven.checkstyle.plugin.version>
-    <maven.pmd.plugin.version>3.21.2</maven.pmd.plugin.version>
+    <maven.pmd.plugin.version>3.22.0</maven.pmd.plugin.version>
   </properties>
 
   <dependencies>
@@ -49,7 +49,6 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <version>${maven.checkstyle.plugin.version}</version>
         <dependencies>
-          <!-- Pin the Checkstyle engine version -->
           <dependency>
             <groupId>com.puppycrawl.tools</groupId>
             <artifactId>checkstyle</artifactId>
@@ -75,7 +74,7 @@
         </executions>
       </plugin>
 
-      <!-- PMD -->
+      <!-- PMD 7 compatibile con Java 21 -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
@@ -86,8 +85,7 @@
           </rulesets>
           <printFailingErrors>true</printFailingErrors>
           <failOnViolation>true</failOnViolation>
-          <minimumTokens>100</minimumTokens>
-          <targetJdk>${maven.compiler.release}</targetJdk>
+          <languageVersion>21</languageVersion>
         </configuration>
         <executions>
           <execution>
@@ -100,7 +98,6 @@
         </executions>
       </plugin>
 
-      <!-- Surefire for JUnit 5 -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>

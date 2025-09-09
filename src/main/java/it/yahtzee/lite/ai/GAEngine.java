@@ -25,13 +25,15 @@ public class GAEngine {
         public final int id;
         public int threshold;
 
-        public Genome(int t){
+        public Genome(int t) {
             this.id = NEXT_ID++;
             this.threshold = t;
         }
-        public Genome(int t, int id){
+
+        public Genome(int t, int id) {
             this.id = id;
-            this.threshold = t; } // copia preservando ID
+            this.threshold = t;
+        } // copia preservando ID
     }
 
     //CONFIG
@@ -49,22 +51,21 @@ public class GAEngine {
     private int stagnation = 0;
     private double lastGenBest = Double.NEGATIVE_INFINITY;
 
-    public GAEngine(int population, int generations, int gamesPerEval, long seed,
-                    int tournamentK, int elitism, double mutRate, int bestRuns){
-        this.population   = population;
-        this.generations  = generations;
+    public GAEngine(int population, int generations, int gamesPerEval, long seed, int tournamentK, int elitism, double mutRate, int bestRuns) {
+        this.population = population;
+        this.generations = generations;
         this.gamesPerEval = Math.max(1, gamesPerEval);
-        this.rng          = new Random(seed);
-        this.tournamentK  = Math.max(2, tournamentK);
-        this.elitism      = Math.max(0, Math.min(elitism, population));
-        this.baseMutRate  = Math.max(0.0, Math.min(mutRate, 1.0));
-        this.bestRuns     = Math.max(1, bestRuns);
+        this.rng = new Random(seed);
+        this.tournamentK = Math.max(2, tournamentK);
+        this.elitism = Math.max(0, Math.min(elitism, population));
+        this.baseMutRate = Math.max(0.0, Math.min(mutRate, 1.0));
+        this.bestRuns = Math.max(1, bestRuns);
     }
 
     //GA main
-    public Genome run(){
+    public Genome run() {
         List<Genome> pop = new ArrayList<>();
-        for(int i=0;i<population;i++) pop.add(new Genome(1 + rng.nextInt(6)));
+        for (int i = 0; i < population; i++) pop.add(new Genome(1 + rng.nextInt(6)));
 
         YahtzeeGame game = new YahtzeeGame(rng);
         Genome best = pop.get(0);
@@ -73,28 +74,31 @@ public class GAEngine {
         File outDir = new File("runs");
         if (!outDir.exists()) outDir.mkdirs();
 
-        try (PrintWriter csv   = new PrintWriter(new FileWriter(new File(outDir, "fitness.csv")));
-             PrintWriter bests = new PrintWriter(new FileWriter(new File(outDir, "best_genomes.csv")))) {
+        try (PrintWriter csv = new PrintWriter(new FileWriter(new File(outDir, "fitness.csv"))); PrintWriter bests = new PrintWriter(new FileWriter(new File(outDir, "best_genomes.csv")))) {
 
             csv.println("gen,best,avg");
             bests.println("gen,threshold");
 
-            for(int g=0; g<generations; g++){
+            for (int g = 0; g < generations; g++) {
                 //valutazione
                 double[] fit = new double[population];
-                for(int i=0;i<population;i++){
+                for (int i = 0; i < population; i++) {
                     fit[i] = eval(game, pop.get(i));
-                    if(fit[i] > overallBestFit){
+                    if (fit[i] > overallBestFit) {
                         overallBestFit = fit[i];
                         best = pop.get(i);
                     }
                 }
 
                 //log aggregato
-                double genBest = -1, sum = 0; int genBestIdx = 0;
-                for (int i=0;i<fit.length;i++) {
+                double genBest = -1, sum = 0;
+                int genBestIdx = 0;
+                for (int i = 0; i < fit.length; i++) {
                     double f = fit[i];
-                    if (f > genBest) { genBest = f; genBestIdx = i; }
+                    if (f > genBest) {
+                        genBest = f;
+                        genBestIdx = i;
+                    }
                     sum += f;
                 }
                 double avg = sum / fit.length;
@@ -121,18 +125,21 @@ public class GAEngine {
                     int bestIdx = -1;
                     double bfit = Double.NEGATIVE_INFINITY;
                     for (int i = 0; i < population; i++) {
-                        if (!used[i] && fit[i] > bfit) { bfit = fit[i]; bestIdx = i; }
+                        if (!used[i] && fit[i] > bfit) {
+                            bfit = fit[i];
+                            bestIdx = i;
+                        }
                     }
                     used[bestIdx] = true;
                     Genome elite = pop.get(bestIdx);
                     next.add(new Genome(elite.threshold, elite.id)); // preserva ID sugli elite
                 }
 
-                while(next.size() < population){
+                while (next.size() < population) {
                     Genome p1 = tournament(pop, fit);
                     Genome p2 = tournament(pop, fit);
                     int childT = rng.nextBoolean() ? p1.threshold : p2.threshold; // crossover uniforme
-                    if(rng.nextDouble() < currentMutRate) childT = mutateThreshold(childT);
+                    if (rng.nextDouble() < currentMutRate) childT = mutateThreshold(childT);
                     next.add(new Genome(childT)); // nuovi figli = nuovo ID
                 }
 
@@ -166,39 +173,41 @@ public class GAEngine {
             }
         }
 
-        System.out.printf("Miglior partita del genoma #%d su %d run: punteggio=%d%n",
-                best.id, bestRuns, bestScore);
+        System.out.printf("Miglior partita del genoma #%d su %d run: punteggio=%d%n", best.id, bestRuns, bestScore);
         System.out.print(bestMatch.toString());
 
         return best;
     }
 
     //SUPPORTO
-    private int mutateThreshold(int t){
+    private int mutateThreshold(int t) {
         t += rng.nextBoolean() ? 1 : -1;
         if (t < 1) t = 1;
         if (t > 6) t = 6;
         return t;
     }
 
-    private double eval(YahtzeeGame game, Genome g){
+    private double eval(YahtzeeGame game, Genome g) {
         // strategia: tieni i dadi >= threshold
-        Strategy s = (dice, rollsLeft)->{
+        Strategy s = (dice, rollsLeft) -> {
             boolean[] keep = new boolean[5];
-            for(int i=0;i<5;i++) keep[i] = dice[i] >= g.threshold;
+            for (int i = 0; i < 5; i++) keep[i] = dice[i] >= g.threshold;
             return keep;
         };
         double sum = 0;
-        for(int i=0;i<gamesPerEval;i++) sum += game.playUpperWith(s);
+        for (int i = 0; i < gamesPerEval; i++) sum += game.playUpperWith(s);
         return sum / gamesPerEval;
     }
 
-    private Genome tournament(List<Genome> pop, double[] fit){
+    private Genome tournament(List<Genome> pop, double[] fit) {
         int bestIdx = rng.nextInt(pop.size());
         double bestFit = fit[bestIdx];
         for (int c = 1; c < tournamentK; c++) {
             int idx = rng.nextInt(pop.size());
-            if (fit[idx] > bestFit) { bestIdx = idx; bestFit = fit[idx]; }
+            if (fit[idx] > bestFit) {
+                bestIdx = idx;
+                bestFit = fit[idx];
+            }
         }
         return pop.get(bestIdx);
     }
