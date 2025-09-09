@@ -20,12 +20,15 @@ public class ScoreCard {
 
     //Applica la categoria scelta e aggiorna il totale
     public void use(Category c, int[] dice){
-        if (used[c.ordinal()]) throw new IllegalStateException("Categoria già usata: " + c);
+        if (used[c.ordinal()])
+            throw new IllegalStateException("Categoria già usata: " + c);
         upperTotal += scoreFor(c, dice);
         used[c.ordinal()] = true;
     }
 
-    public boolean isUsed(Category c){ return used[c.ordinal()]; }
+    public boolean isUsed(Category c){
+        return used[c.ordinal()];
+    }
 
     public int categoriesLeft(){
         int left = 0;
@@ -39,5 +42,7 @@ public class ScoreCard {
         return upperTotal + bonus;
     }
 
-    public int getUpperTotal(){ return upperTotal; }
+    public int getUpperTotal(){
+        return upperTotal;
+    }
 }

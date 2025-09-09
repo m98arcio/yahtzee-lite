@@ -19,17 +19,22 @@ import java.util.Random;
  */
 public class GAEngine {
 
-    // === GENOME con ID persistente ===
+    //GENOME con ID persistente
     public static class Genome {
         private static int NEXT_ID = 1;
         public final int id;
         public int threshold;
 
-        public Genome(int t){ this.id = NEXT_ID++; this.threshold = t; }
-        public Genome(int t, int id){ this.id = id; this.threshold = t; } // copia preservando ID
+        public Genome(int t){
+            this.id = NEXT_ID++;
+            this.threshold = t;
+        }
+        public Genome(int t, int id){
+            this.id = id;
+            this.threshold = t; } // copia preservando ID
     }
 
-    // === CONFIG ===
+    //CONFIG
     private final int population;
     private final int generations;
     private final int gamesPerEval;
@@ -39,7 +44,7 @@ public class GAEngine {
     private final int elitism;
     private final double baseMutRate;
 
-    private final int bestRuns; // <-- nuovo: numero di partite extra per il best genome
+    private final int bestRuns; //numero di partite extra per il best genome
 
     private int stagnation = 0;
     private double lastGenBest = Double.NEGATIVE_INFINITY;
@@ -56,7 +61,7 @@ public class GAEngine {
         this.bestRuns     = Math.max(1, bestRuns);
     }
 
-    // === GA main ===
+    //GA main
     public Genome run(){
         List<Genome> pop = new ArrayList<>();
         for(int i=0;i<population;i++) pop.add(new Genome(1 + rng.nextInt(6)));
@@ -75,7 +80,7 @@ public class GAEngine {
             bests.println("gen,threshold");
 
             for(int g=0; g<generations; g++){
-                // --- valutazione ---
+                //valutazione
                 double[] fit = new double[population];
                 for(int i=0;i<population;i++){
                     fit[i] = eval(game, pop.get(i));
@@ -85,7 +90,7 @@ public class GAEngine {
                     }
                 }
 
-                // --- log aggregato ---
+                //log aggregato
                 double genBest = -1, sum = 0; int genBestIdx = 0;
                 for (int i=0;i<fit.length;i++) {
                     double f = fit[i];
@@ -97,7 +102,7 @@ public class GAEngine {
                 csv.printf("%d,%.2f,%.2f%n", g, genBest, avg);
                 bests.printf("%d,%d%n", g, pop.get(genBestIdx).threshold);
 
-                // --- mutazione adattiva ---
+                //mutazione adattiva
                 double currentMutRate = baseMutRate;
                 if (genBest > lastGenBest + 1e-9) {
                     stagnation = 0;
@@ -107,7 +112,7 @@ public class GAEngine {
                     currentMutRate = Math.min(0.9, baseMutRate * (1.0 + 0.5 * stagnation));
                 }
 
-                // --- nuova popolazione: elitismo + torneo ---
+                //nuova popolazione: elitismo + torneo
                 List<Genome> next = new ArrayList<>();
 
                 int elitesToCopy = Math.min(elitism, population);
@@ -137,7 +142,7 @@ public class GAEngine {
             System.err.println("Errore scrittura CSV: " + e.getMessage());
         }
 
-        // === REPORT FINALE ===
+        //REPORT FINALE
         final int bestThreshold = best.threshold; // catturato per lambda
         Strategy bestStrategy = (dice, rollsLeft) -> {
             boolean[] keep = new boolean[5];
@@ -154,7 +159,7 @@ public class GAEngine {
 
         for (int i = 0; i < bestRuns; i++) {
             YahtzeeGame.MatchLog log = evalGame.playUpperWithLog(bestStrategy);
-            int total = log.upperTotal; // niente bonus
+            int total = log.upperTotal;
             if (total > bestScore) {
                 bestScore = total;
                 bestMatch = log;
@@ -168,7 +173,7 @@ public class GAEngine {
         return best;
     }
 
-    // === SUPPORTO ===
+    //SUPPORTO
     private int mutateThreshold(int t){
         t += rng.nextBoolean() ? 1 : -1;
         if (t < 1) t = 1;

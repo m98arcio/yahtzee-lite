@@ -39,7 +39,7 @@ public class YahtzeeGame {
 
         @Override public String toString() {
             StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < rounds.size(); i++) {
+            for (int i = 0; i < rounds.size(); i++ ) {
                 RoundLog r = rounds.get(i);
                 sb.append(String.format("  Round %d: cat=%s  score=%d  dice=%s%n",
                         i+1, r.category, r.roundScore, Arrays.toString(r.dice)));
@@ -58,7 +58,7 @@ public class YahtzeeGame {
         ScoreCard sc = new ScoreCard();
         List<RoundLog> logs = new ArrayList<>();
 
-        for (int round = 0; round < 6; round++){
+        for (int round = 0; round < 6; round++ ){
             dice.rollAll();
             // due reroll (totale 3 lanci): la strategia decide cosa tenere
             for(int r=2; r>=1; r--){
@@ -80,12 +80,12 @@ public class YahtzeeGame {
             logs.add(new RoundLog(bestCat, dice.values(), bestScore));
         }
         int upper = sc.getUpperTotal();
-        boolean gotBonus = upper >= 63; // info, non incide sul return
+        boolean gotBonus = upper >= 63;  // info, non incide sul return
         return new MatchLog(logs, upper, gotBonus);
     }
 
     public int playUpperWith(Strategy strategy){
         MatchLog log = playUpperWithLog(strategy);
-        return log.upperTotal; // niente bonus nel punteggio restituito
+        return log.upperTotal;  // niente bonus nel punteggio restituito
     }
 }

@@ -13,7 +13,7 @@ public class Main {
         for (String a : args) {
             if (a.startsWith("--") && a.contains("=")) {
                 int i = a.indexOf('=');
-                m.put(a.substring(2, i), a.substring(i+1));
+                m.put(a.substring(2, i), a.substring(i + 1));
             }
         }
         return m;
