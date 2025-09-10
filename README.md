@@ -25,6 +25,15 @@ Esegui il comando run dal main
 Workflow in `.github/workflows/ci.yml` (Java 21 + Maven).
 Ogni push su main esegue build e test.
 
+## Test Checkstyle
+```bash
+mvn -DskipTests=true checkstyle:check 
+```
+## Test PDM-rouleset
+```bash
+mvn -DskipTests=true pmd:check
+```
+
 ## Docker
 ```bash
 docker build -t yahtzee-lite .

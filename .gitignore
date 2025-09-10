@@ -1,6 +1,12 @@
+#Cartella di Maven
 target/
+#Configurazioni di intellij
 .idea/
+#File IntelliJ
 *.iml
+#Sono file nascosti che macOS crea nelle cartelle
 .DS_Store
+#Cartella con log
 logs/
+#Esecuzioni del codice
 runs/
